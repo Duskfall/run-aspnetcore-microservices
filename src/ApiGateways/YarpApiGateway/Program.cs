@@ -1,4 +1,8 @@
 using Microsoft.AspNetCore.RateLimiting;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +18,22 @@ builder.Services.AddRateLimiter(rateLimiterOptions =>
         options.PermitLimit = 5;
     });
 });
+
+// OpenTelemetry Configuration
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource
+        .AddService("yarp-api-gateway", "1.0.0"))
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddOtlpExporter())
+    .WithMetrics(metrics => metrics
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddOtlpExporter());
+
+builder.Logging.AddOpenTelemetry(logging => logging
+    .AddOtlpExporter());
 
 var app = builder.Build();
 

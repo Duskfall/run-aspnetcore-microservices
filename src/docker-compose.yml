@@ -52,9 +52,13 @@ services:
       context: .
       dockerfile: WebApps/Shopping.Web/Dockerfile
 
+  aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:latest
+
 volumes:
   postgres_catalog:
   postgres_basket:
+  aspire_data:
 
 
 
